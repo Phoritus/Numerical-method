@@ -2,12 +2,14 @@ import { compile, derivative } from 'mathjs';
 var Algebrite = require('algebrite');
 
 const getXL_XR_from_API = async () => {
-    const response = await fetch("http://localhost:5004/api/function_LR").then(res => {
-       // console.log(res.json());
-        return res.json();
-    })
-    return response;
-
+    try {
+        const res = await fetch('/api/function_LR');
+        if (!res.ok) throw new Error('Network response was not ok');
+        return await res.json();
+    } catch (err) {
+        console.error('Failed to fetch /api/function_LR:', err);
+        return [];
+    }
 }
 
 const func = (fx, X) => {

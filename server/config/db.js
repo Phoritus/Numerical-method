@@ -1,24 +1,20 @@
 const mongoose = require("mongoose");
 const config = require("config");
 
-// เรียก mongodb ใน json ที่เราสร้าง
-const db = config.get("mongoURI");
-
-
 const connectDB = async () => {
   try {
-    // ใส่ await เพื่อให้รอจนเสร็จก่อน
+    const db = process.env.MONGO_URI || (config.has('mongoURI') ? config.get('mongoURI') : '');
+    if (!db || /----/.test(db)) {
+      console.warn("MongoDB URI missing or placeholder detected. Skipping DB connection.");
+      return;
+    }
     await mongoose.connect(db, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useCreateIndex: true,
     });
-    // ถ้าเชื่อมต่อสำเร็จให้แสดง
-    console.log("Mongodb connect...");
+    console.log("MongoDB connected ✅");
   } catch (err) {
-    // ถ้า มีปัญหา
-    console.error(err.message);
-    process.exit(1);
+    console.error("MongoDB connection error:", err.message);
   }
 };
 module.exports = connectDB;
